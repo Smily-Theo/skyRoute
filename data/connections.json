@@ -1,0 +1,14 @@
+[
+ {"from":"chennai","to":"coimbatore","frequency_per_hour":4,"status":"simulated"},
+ {"from":"chennai","to":"tiruchirappalli","frequency_per_hour":4,"status":"simulated"},
+ {"from":"chennai","to":"madurai","frequency_per_hour":3,"status":"simulated"},
+ {"from":"coimbatore","to":"madurai","frequency_per_hour":3,"status":"simulated"},
+ {"from":"coimbatore","to":"salem","frequency_per_hour":3,"status":"simulated"},
+ {"from":"tiruchirappalli","to":"madurai","frequency_per_hour":3,"status":"simulated"},
+ {"from":"madurai","to":"tirunelveli","frequency_per_hour":2,"status":"simulated"},
+ {"from":"chennai","to":"vellore","frequency_per_hour":3,"status":"simulated"},
+ {"from":"salem","to":"tiruchirappalli","frequency_per_hour":2,"status":"simulated"},
+ {"from":"madurai","to":"thoothukudi","frequency_per_hour":2,"status":"simulated"},
+ {"from":"tiruchirappalli","to":"thanjavur","frequency_per_hour":2,"status":"simulated"},
+ {"from":"coimbatore","to":"tiruppur","frequency_per_hour":2,"status":"simulated"}
+]

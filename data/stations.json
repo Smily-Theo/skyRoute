@@ -1,0 +1,12 @@
+[
+ {"id":"ST-01","name":"Chennai Central Concept Hub","city":"chennai","capacity":42,"status":"hypothetical","kind":"Urban mobility","score":92},
+ {"id":"ST-02","name":"Coimbatore Gateway Concept Hub","city":"coimbatore","capacity":30,"status":"hypothetical","kind":"Regional gateway","score":88},
+ {"id":"ST-03","name":"Madurai South Concept Hub","city":"madurai","capacity":28,"status":"hypothetical","kind":"Regional gateway","score":84},
+ {"id":"ST-04","name":"Trichy Central Concept Hub","city":"tiruchirappalli","capacity":24,"status":"hypothetical","kind":"Regional connector","score":81},
+ {"id":"ST-05","name":"Salem Junction Concept Hub","city":"salem","capacity":20,"status":"hypothetical","kind":"Regional connector","score":76},
+ {"id":"ST-06","name":"Tirunelveli Concept Hub","city":"tirunelveli","capacity":18,"status":"hypothetical","kind":"Regional connector","score":72},
+ {"id":"ST-07","name":"Vellore Concept Hub","city":"vellore","capacity":18,"status":"hypothetical","kind":"Regional connector","score":69},
+ {"id":"ST-08","name":"Thoothukudi Concept Hub","city":"thoothukudi","capacity":16,"status":"hypothetical","kind":"Regional connector","score":67},
+ {"id":"ST-09","name":"Dindigul Concept Hub","city":"dindigul","capacity":14,"status":"hypothetical","kind":"Local connector","score":64},
+ {"id":"ST-10","name":"Thanjavur Concept Hub","city":"thanjavur","capacity":14,"status":"hypothetical","kind":"Local connector","score":61}
+]

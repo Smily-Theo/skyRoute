@@ -1,0 +1,353 @@
+[
+  {
+    "id": "chennai",
+    "name": "Chennai",
+    "district": "Chennai",
+    "lat": 13.0827,
+    "lon": 80.2707,
+    "type": "metro",
+    "demand": 0.98
+  },
+  {
+    "id": "coimbatore",
+    "name": "Coimbatore",
+    "district": "Coimbatore",
+    "lat": 11.0168,
+    "lon": 76.9558,
+    "type": "city",
+    "demand": 0.87
+  },
+  {
+    "id": "madurai",
+    "name": "Madurai",
+    "district": "Madurai",
+    "lat": 9.9252,
+    "lon": 78.1198,
+    "type": "city",
+    "demand": 0.82
+  },
+  {
+    "id": "tiruchirappalli",
+    "name": "Tiruchirappalli",
+    "district": "Tiruchirappalli",
+    "lat": 10.7905,
+    "lon": 78.7047,
+    "type": "city",
+    "demand": 0.75
+  },
+  {
+    "id": "salem",
+    "name": "Salem",
+    "district": "Salem",
+    "lat": 11.6643,
+    "lon": 78.146,
+    "type": "city",
+    "demand": 0.66
+  },
+  {
+    "id": "tirunelveli",
+    "name": "Tirunelveli",
+    "district": "Tirunelveli",
+    "lat": 8.7139,
+    "lon": 77.7567,
+    "type": "city",
+    "demand": 0.61
+  },
+  {
+    "id": "thanjavur",
+    "name": "Thanjavur",
+    "district": "Thanjavur",
+    "lat": 10.787,
+    "lon": 79.1378,
+    "type": "city",
+    "demand": 0.54
+  },
+  {
+    "id": "vellore",
+    "name": "Vellore",
+    "district": "Vellore",
+    "lat": 12.9165,
+    "lon": 79.1325,
+    "type": "city",
+    "demand": 0.58
+  },
+  {
+    "id": "erode",
+    "name": "Erode",
+    "district": "Erode",
+    "lat": 11.341,
+    "lon": 77.7172,
+    "type": "city",
+    "demand": 0.53
+  },
+  {
+    "id": "dindigul",
+    "name": "Dindigul",
+    "district": "Dindigul",
+    "lat": 10.3673,
+    "lon": 77.9803,
+    "type": "city",
+    "demand": 0.48
+  },
+  {
+    "id": "thoothukudi",
+    "name": "Thoothukudi",
+    "district": "Thoothukudi",
+    "lat": 8.7642,
+    "lon": 78.1348,
+    "type": "city",
+    "demand": 0.52
+  },
+  {
+    "id": "nagercoil",
+    "name": "Nagercoil",
+    "district": "Kanniyakumari",
+    "lat": 8.1833,
+    "lon": 77.4119,
+    "type": "city",
+    "demand": 0.42
+  },
+  {
+    "id": "tiruppur",
+    "name": "Tiruppur",
+    "district": "Tiruppur",
+    "lat": 11.1085,
+    "lon": 77.3411,
+    "type": "city",
+    "demand": 0.64
+  },
+  {
+    "id": "kanchipuram",
+    "name": "Kanchipuram",
+    "district": "Kanchipuram",
+    "lat": 12.8342,
+    "lon": 79.7036,
+    "type": "city",
+    "demand": 0.49
+  },
+  {
+    "id": "cuddalore",
+    "name": "Cuddalore",
+    "district": "Cuddalore",
+    "lat": 11.748,
+    "lon": 79.7714,
+    "type": "city",
+    "demand": 0.45
+  },
+  {
+    "id": "villupuram",
+    "name": "Villupuram",
+    "district": "Villupuram",
+    "lat": 11.9401,
+    "lon": 79.4861,
+    "type": "city",
+    "demand": 0.46
+  },
+  {
+    "id": "karur",
+    "name": "Karur",
+    "district": "Karur",
+    "lat": 10.9601,
+    "lon": 78.0766,
+    "type": "city",
+    "demand": 0.41
+  },
+  {
+    "id": "krishnagiri",
+    "name": "Krishnagiri",
+    "district": "Krishnagiri",
+    "lat": 12.5186,
+    "lon": 78.2137,
+    "type": "city",
+    "demand": 0.39
+  },
+  {
+    "id": "sivakasi",
+    "name": "Sivakasi",
+    "district": "Virudhunagar",
+    "lat": 9.4533,
+    "lon": 77.7977,
+    "type": "city",
+    "demand": 0.38
+  },
+  {
+    "id": "kanyakumari",
+    "name": "Kanyakumari",
+    "district": "Kanniyakumari",
+    "lat": 8.0883,
+    "lon": 77.5385,
+    "type": "city",
+    "demand": 0.37
+  },
+  {
+    "id": "ariyalur",
+    "name": "Ariyalur",
+    "district": "Ariyalur",
+    "lat": 11.1401,
+    "lon": 79.0786,
+    "type": "district_hq",
+    "demand": 0.3
+  },
+  {
+    "id": "chengalpattu",
+    "name": "Chengalpattu",
+    "district": "Chengalpattu",
+    "lat": 12.6819,
+    "lon": 79.9888,
+    "type": "district_hq",
+    "demand": 0.47
+  },
+  {
+    "id": "dharmapuri",
+    "name": "Dharmapuri",
+    "district": "Dharmapuri",
+    "lat": 12.1277,
+    "lon": 78.1579,
+    "type": "district_hq",
+    "demand": 0.38
+  },
+  {
+    "id": "kallakurichi",
+    "name": "Kallakurichi",
+    "district": "Kallakurichi",
+    "lat": 11.738,
+    "lon": 78.959,
+    "type": "district_hq",
+    "demand": 0.34
+  },
+  {
+    "id": "mayiladuthurai",
+    "name": "Mayiladuthurai",
+    "district": "Mayiladuthurai",
+    "lat": 11.1035,
+    "lon": 79.655,
+    "type": "district_hq",
+    "demand": 0.34
+  },
+  {
+    "id": "nagapattinam",
+    "name": "Nagapattinam",
+    "district": "Nagapattinam",
+    "lat": 10.7672,
+    "lon": 79.8449,
+    "type": "district_hq",
+    "demand": 0.35
+  },
+  {
+    "id": "namakkal",
+    "name": "Namakkal",
+    "district": "Namakkal",
+    "lat": 11.2189,
+    "lon": 78.1677,
+    "type": "district_hq",
+    "demand": 0.42
+  },
+  {
+    "id": "nilgiris",
+    "name": "Udhagamandalam (Ooty)",
+    "district": "The Nilgiris",
+    "lat": 11.4102,
+    "lon": 76.695,
+    "type": "district_hq",
+    "demand": 0.39
+  },
+  {
+    "id": "perambalur",
+    "name": "Perambalur",
+    "district": "Perambalur",
+    "lat": 11.2342,
+    "lon": 78.8807,
+    "type": "district_hq",
+    "demand": 0.29
+  },
+  {
+    "id": "pudukkottai",
+    "name": "Pudukkottai",
+    "district": "Pudukkottai",
+    "lat": 10.3797,
+    "lon": 78.8208,
+    "type": "district_hq",
+    "demand": 0.36
+  },
+  {
+    "id": "ramanathapuram",
+    "name": "Ramanathapuram",
+    "district": "Ramanathapuram",
+    "lat": 9.3639,
+    "lon": 78.8395,
+    "type": "district_hq",
+    "demand": 0.32
+  },
+  {
+    "id": "ranipet",
+    "name": "Ranipet",
+    "district": "Ranipet",
+    "lat": 12.9273,
+    "lon": 79.3333,
+    "type": "district_hq",
+    "demand": 0.39
+  },
+  {
+    "id": "sivaganga",
+    "name": "Sivaganga",
+    "district": "Sivaganga",
+    "lat": 9.8433,
+    "lon": 78.4809,
+    "type": "district_hq",
+    "demand": 0.33
+  },
+  {
+    "id": "tenkasi",
+    "name": "Tenkasi",
+    "district": "Tenkasi",
+    "lat": 8.959,
+    "lon": 77.3152,
+    "type": "district_hq",
+    "demand": 0.34
+  },
+  {
+    "id": "theni",
+    "name": "Theni",
+    "district": "Theni",
+    "lat": 10.0104,
+    "lon": 77.4768,
+    "type": "district_hq",
+    "demand": 0.38
+  },
+  {
+    "id": "tirupathur",
+    "name": "Tirupathur",
+    "district": "Tirupathur",
+    "lat": 12.4967,
+    "lon": 78.5729,
+    "type": "district_hq",
+    "demand": 0.33
+  },
+  {
+    "id": "tiruvallur",
+    "name": "Tiruvallur",
+    "district": "Tiruvallur",
+    "lat": 13.1437,
+    "lon": 79.9089,
+    "type": "district_hq",
+    "demand": 0.46
+  },
+  {
+    "id": "tiruvannamalai",
+    "name": "Tiruvannamalai",
+    "district": "Tiruvannamalai",
+    "lat": 12.2253,
+    "lon": 79.0747,
+    "type": "district_hq",
+    "demand": 0.43
+  },
+  {
+    "id": "tiruvarur",
+    "name": "Tiruvarur",
+    "district": "Tiruvarur",
+    "lat": 10.7727,
+    "lon": 79.6368,
+    "type": "district_hq",
+    "demand": 0.32
+  }
+]
