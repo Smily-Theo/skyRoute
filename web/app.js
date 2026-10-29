@@ -38,10 +38,27 @@ function toast(message) {
 /* Connect the Vercel frontend to the Render backend. */
 const API_BASE = 'https://skyroute-intelligence.onrender.com';
 
+```javascript
 async function api(path, options = {}) {
-  const url = /^https?:\/\//i.test(path)
-    ? path
-    : `${API\_BASE}${path.startsWith('/') ? path : `/${path}`}`;
+    const url = /^https?:\/\//i.test(path)
+        ? path
+        : `${API_BASE}${path.startsWith('/') ? path : `/${path}`}`;
+
+    const res = await fetch(url, {
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...(options.headers || {})
+        }
+    });
+
+    if (!res.ok) {
+        throw new Error(`API error: ${res.status} ${res.statusText}`);
+    }
+
+    return res.json();
+}
+```
 
   const res = await fetch(url, {
     ...options,
