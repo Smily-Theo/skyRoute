@@ -14,7 +14,12 @@ const state = {
   animationFrame: null,
   animationPaused: false,
   animationElapsed: 0,
-  animationDuration: 0
+  animationDuration: 0,
+  animationMarker: null,
+  animationSegments: [],
+  animationSegmentDurations: [],
+  animationStart: 0,
+  pendingAnimationRoute: null
 };
 
 const fmt = n => Number(n).toLocaleString('en-IN');
@@ -38,41 +43,12 @@ function toast(message) {
 /* Connect the Vercel frontend to the Render backend. */
 const API_BASE = 'https://skyroute-intelligence.onrender.com';
 
-```javascript
 async function api(path, options = {}) {
-    let url;
+  const endpoint = /^https?:\/\//i.test(path)
+    ? path
+    : API_BASE + (path.startsWith('/') ? path : '/' + path);
 
-    if (/^https?:\/\//i.test(path)) {
-        url = path;
-    } else {
-        const endpoint = path.startsWith("/") ? path : "/" + path;
-        url = API_BASE + endpoint;
-    }
-
-    const res = await fetch(url, {
-        ...options,
-        headers: {
-            "Content-Type": "application/json",
-            ...(options.headers || {})
-        }
-    });
-
-    if (!res.ok) {
-        throw new Error("API error: " + res.status + " " + res.statusText);
-    }
-
-    return res.json();
-}
-```
-    if (!res.ok) {
-        throw new Error(`API error: ${res.status} ${res.statusText}`);
-    }
-
-    return res.json();
-}
-```
-
-  const res = await fetch(url, {
+  const response = await fetch(endpoint, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
@@ -80,12 +56,12 @@ async function api(path, options = {}) {
     }
   });
 
-  const data = await res.json().catch(() => ({
+  const data = await response.json().catch(() => ({
     error: 'The server returned an unreadable response.'
   }));
 
-  if (!res.ok) {
-    throw new Error(data.error || `Request failed (${res.status})`);
+  if (!response.ok) {
+    throw new Error(data.error || `Request failed (${response.status})`);
   }
 
   return data;
@@ -152,7 +128,7 @@ function renderMap(id, { route = null, infra = false, labels = true } = {}) {
     'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {
       maxZoom: 19,
-      attribution: '© <a href="https://www.openstreetmap.org/copyright" target="\_blank" rel="noopener">OpenStreetMap contributors</a>'
+      attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>'
     }
   ).addTo(map);
 
@@ -359,7 +335,7 @@ function renderMap(id, { route = null, infra = false, labels = true } = {}) {
       const modeName = air ? 'SIMULATED FLIGHT' : 'ROAD TRAVEL';
 
       line.bindTooltip(
-        `${modeName} · ${fmt(seg.distance\_km)} km · ${duration(seg.duration\_minutes)}`,
+        `${modeName} · ${fmt(seg.distance_km)} km · ${duration(seg.duration_minutes)}`,
         {
           sticky: true,
           permanent: true,
@@ -384,8 +360,8 @@ function renderMap(id, { route = null, infra = false, labels = true } = {}) {
       const popup = (title, detail) =>
         `<div class="route-popup"><b>${esc(title)}</b><br>` +
         `${esc(detail || 'Journey waypoint')}<br>` +
-        `<strong>${fmt(seg.distance\_km)} km</strong> · ` +
-        `${duration(seg.duration\_minutes)}</div>`;
+        `<strong>${fmt(seg.distance_km)} km</strong> · ` +
+        `${duration(seg.duration_minutes)}</div>`;
 
       L.circleMarker(a, {
         pane: 'routeMarkers',
@@ -679,7 +655,7 @@ function routeCard(route) {
 
   const detail = route.segments
     .map(s =>
-      `${esc(s.mode === 'air' ? 'Air concept' : 'Road')}: ${duration(s.duration\_minutes)}`
+      `${esc(s.mode === 'air' ? 'Air concept' : 'Road')}: ${duration(s.duration_minutes)}`
     )
     .join(' · ');
 
@@ -730,11 +706,11 @@ function renderJourneySteps(route) {
       ? 'Take off here and fly to the marked landing point (simulated).'
       : (
           i === 0 && route.segments.some(x => x.mode === 'air')
-            ? `Drive approximately ${fmt(seg.distance\_km)} km by road to reach the takeoff point.`
+            ? `Drive approximately ${fmt(seg.distance_km)} km by road to reach the takeoff point.`
             : (
                 route.segments.some(x => x.mode === 'air') &&
                 i === route.segments.length - 1
-                  ? `After landing, drive approximately ${fmt(seg.distance\_km)} km by road to reach your destination.`
+                  ? `After landing, drive approximately ${fmt(seg.distance_km)} km by road to reach your destination.`
                   : defaultText
               )
         );
@@ -762,7 +738,7 @@ function renderRoutes(data) {
   state.selectedRoute = data.selected_route_id || state.routes[0]?.id;
 
   $('#routeSubtitle').textContent =
-    `${data.origin.name} → ${data.destination.name} · ${data.preference.replace('\_', ' ')}`;
+    `${data.origin.name} → ${data.destination.name} · ${data.preference.replace('_', ' ')}`;
 
   $('#resultsCount').textContent =
     `${state.routes.length} OPTION${state.routes.length === 1 ? '' : 'S'}`;
@@ -971,112 +947,156 @@ async function runRoutes() {
 }
 
 function startJourneyAnimation(route) {
-  if (state.animationFrame) {
-    cancelAnimationFrame(state.animationFrame);
-    state.animationFrame = null;
+  const map = leafletMaps.routeMap;
+  if (!map || !route) {
+    toast('The route map is not ready yet.');
+    return;
   }
 
+  if (state.animationFrame) cancelAnimationFrame(state.animationFrame);
+  state.animationFrame = null;
   state.animationPaused = false;
   state.animationElapsed = 0;
-  state.animationDuration = 8000;
-
-  const map = leafletMaps.routeMap;
-
-  if (!map || !route) return;
 
   const segments = (route.segments || [])
-    .map(seg => ({
-      ...seg,
-      coordinates: (seg.coordinates || [])
-        .filter(c =>
-          Array.isArray(c) &&
-          c.length >= 2 &&
-          Number.isFinite(+c[0]) &&
-          Number.isFinite(+c[1])
-        )
-        .map(c => [+c[0], +c[1]])
+    .map(segment => ({
+      ...segment,
+      coordinates: (segment.coordinates || [])
+        .filter(c => Array.isArray(c) && c.length >= 2 && Number.isFinite(Number(c[0])) && Number.isFinite(Number(c[1])))
+        .map(c => [Number(c[0]), Number(c[1])])
     }))
-    .filter(seg => seg.coordinates.length >= 2);
+    .filter(segment => segment.coordinates.length >= 2);
 
   if (!segments.length) {
     toast('No route geometry is available to animate.');
     return;
   }
 
-  const allPoints = segments.flatMap(seg => seg.coordinates);
-  const marker = L.marker(allPoints[0]).addTo(map);
+  // Remove the previous animated marker so replay never leaves duplicates.
+  if (state.animationMarker) {
+    map.removeLayer(state.animationMarker);
+    state.animationMarker = null;
+  }
 
-  const startedAt = performance.now();
+  const segmentDurations = segments.map(segment => segment.mode === 'air' ? 4200 : 3000);
+  const totalDuration = segmentDurations.reduce((sum, value) => sum + value, 0);
+  state.animationDuration = totalDuration;
+  state.animationSegments = segments;
+  state.animationSegmentDurations = segmentDurations;
+  state.animationStart = performance.now();
+  state.pendingAnimationRoute = route;
+
+  const firstPoint = segments[0].coordinates[0];
+  state.animationMarker = L.marker(firstPoint, {
+    icon: L.divIcon({
+      className: 'skyroute-animated-vehicle',
+      html: '<span style="display:block;width:18px;height:18px;border:3px solid white;border-radius:50%;background:#2563eb;box-shadow:0 1px 8px #1238"></span>',
+      iconSize: [24, 24],
+      iconAnchor: [12, 12]
+    }),
+    zIndexOffset: 2000,
+    keyboard: false
+  }).addTo(map);
 
   $('#pauseJourney').disabled = false;
+  $('#pauseJourney').textContent = 'Ⅱ Pause';
+  $('#replayJourney').disabled = false;
   $('#replayJourney').textContent = '↻ Replay';
 
   function frame(now) {
     if (state.animationPaused) return;
+    const elapsed = Math.min(totalDuration, now - state.animationStart);
+    state.animationElapsed = elapsed;
 
-    const progress = Math.min(1, (now - startedAt) / state.animationDuration);
-    const pointIndex = Math.min(
-      allPoints.length - 1,
-      Math.floor(progress * (allPoints.length - 1))
-    );
+    let remaining = elapsed;
+    let segmentIndex = 0;
+    let segmentProgress = 0;
+    for (let i = 0; i < segmentDurations.length; i++) {
+      if (remaining <= segmentDurations[i]) {
+        segmentIndex = i;
+        segmentProgress = Math.max(0, Math.min(1, remaining / segmentDurations[i]));
+        break;
+      }
+      remaining -= segmentDurations[i];
+      segmentIndex = i;
+      segmentProgress = 1;
+    }
 
-    marker.setLatLng(allPoints[pointIndex]);
+    const segment = segments[segmentIndex];
+    const coords = segment.coordinates;
+    const lengths = [];
+    let pathLength = 0;
+    for (let i = 1; i < coords.length; i++) {
+      const a = L.latLng(coords[i - 1]);
+      const b = L.latLng(coords[i]);
+      const distance = a.distanceTo(b);
+      lengths.push(distance);
+      pathLength += distance;
+    }
 
-    $('#journeyProgressPercent').textContent =
-      `${Math.round(progress \* 100)}%`;
+    let targetDistance = pathLength * segmentProgress;
+    let position = coords[coords.length - 1];
+    for (let i = 0; i < lengths.length; i++) {
+      if (targetDistance <= lengths[i] || i === lengths.length - 1) {
+        const fraction = lengths[i] ? Math.max(0, Math.min(1, targetDistance / lengths[i])) : 1;
+        position = [
+          coords[i][0] + (coords[i + 1][0] - coords[i][0]) * fraction,
+          coords[i][1] + (coords[i + 1][1] - coords[i][1]) * fraction
+        ];
+        break;
+      }
+      targetDistance -= lengths[i];
+    }
 
-    $('#journeyProgressBar').style.width =
-      `${progress \* 100}%`;
+    state.animationMarker.setLatLng(position);
+    const percent = Math.round(elapsed / totalDuration * 100);
+    $('#journeyProgressPercent').textContent = percent + '%';
+    $('#journeyProgressBar').style.width = percent + '%';
+    $('#journeyProgressLabel').textContent = elapsed >= totalDuration
+      ? 'Journey animation complete'
+      : `Stage ${segmentIndex + 1} of ${segments.length} · ${segment.mode === 'air' ? 'Simulated air travel' : 'Road travel'}`;
 
-    $('#journeyProgressLabel').textContent =
-      progress >= 1 ? 'Journey animation complete' : 'Simulating journey…';
+    $$('.journey-step').forEach((element, index) => {
+      element.classList.toggle('active', index === segmentIndex && elapsed < totalDuration);
+      element.classList.toggle('complete', index < segmentIndex || (elapsed >= totalDuration && index === segmentIndex));
+    });
 
-    if (progress < 1) {
+    if (elapsed < totalDuration) {
       state.animationFrame = requestAnimationFrame(frame);
     } else {
       state.animationFrame = null;
+      state.animationElapsed = totalDuration;
       $('#pauseJourney').disabled = true;
-      $('#pauseJourney').textContent = 'Ⅱ Pause';
+      $('#pauseJourney').textContent = '✓ Complete';
       toast('Journey animation complete');
     }
   }
 
+  state.animationTick = frame;
   state.animationFrame = requestAnimationFrame(frame);
 }
 
 function pauseJourneyAnimation() {
-  if (state.animationFrame) {
+  if (state.animationFrame !== null) {
+    state.animationPaused = true;
     cancelAnimationFrame(state.animationFrame);
     state.animationFrame = null;
-    state.animationPaused = true;
     $('#pauseJourney').textContent = '▶ Resume';
+    $('#journeyProgressLabel').textContent = 'Animation paused';
     return;
   }
 
-  if (state.animationPaused) {
+  if (state.animationPaused && state.animationElapsed < state.animationDuration && state.animationTick) {
     state.animationPaused = false;
-
-    const route = state.pendingAnimationRoute ||
-      (() => {
-        const r = state.lastRouteData?.routes.find(
-          r => r.id === state.selectedRoute
-        );
-
-        return r
-          ? {
-              ...r,
-              origin: state.lastRouteData.origin,
-              destination: state.lastRouteData.destination
-            }
-          : null;
-      })();
-
-    if (route) resumeJourneyAnimation(route);
+    state.animationStart = performance.now() - state.animationElapsed;
+    $('#pauseJourney').textContent = 'Ⅱ Pause';
+    state.animationFrame = requestAnimationFrame(state.animationTick);
   }
 }
 
 function resumeJourneyAnimation(route) {
-  startJourneyAnimation(route);
+  if (route) state.pendingAnimationRoute = route;
+  if (state.animationPaused) pauseJourneyAnimation();
 }
 
 async function loadInfrastructure() {
@@ -1173,13 +1193,13 @@ function renderSimulation(d) {
   const m = d.metrics;
 
   $('#simSaved').innerHTML =
-    `${m.time\_saved\_minutes}<small>min</small>`;
+    `${m.time_saved_minutes}<small>min</small>`;
 
   $('#simUtil').innerHTML =
-    `${m.capacity\_utilization\_pct}<small>%</small>`;
+    `${m.capacity_utilization_pct}<small>%</small>`;
 
   $('#simCoverage').innerHTML =
-    `${m.network\_coverage\_pct}<small>%</small>`;
+    `${m.network_coverage_pct}<small>%</small>`;
 
   const max = Math.max(...d.chart.map(x => x.minutes));
 
@@ -1210,10 +1230,10 @@ function renderSimulation(d) {
 
   $('#simSummary').innerHTML =
     `Under these assumptions, the illustrative network shows ` +
-    `<strong>${duration(m.road\_only\_minutes)}</strong> for a road-only baseline and ` +
-    `<strong>${duration(m.multimodal\_minutes)}</strong> for a multimodal concept journey. ` +
+    `<strong>${duration(m.road_only_minutes)}</strong> for a road-only baseline and ` +
+    `<strong>${duration(m.multimodal_minutes)}</strong> for a multimodal concept journey. ` +
     `The model indicates a potential difference of <strong>${saved} minutes</strong>. ` +
-    `Capacity utilization is <strong>${level} (${m.capacity\_utilization\_pct}%)</strong>; ` +
+    `Capacity utilization is <strong>${level} (${m.capacity_utilization_pct}%)</strong>; ` +
     `${level === 'high'
       ? 'capacity or service frequency may need further scenario testing.'
       : level === 'moderate'
