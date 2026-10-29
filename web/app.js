@@ -39,19 +39,32 @@ function toast(message) {
 const API_BASE = 'https://skyroute-intelligence.onrender.com';
 
 ```javascript
+```javascript
 async function api(path, options = {}) {
-    const url = /^https?:\/\//i.test(path)
-        ? path
-        : `${API_BASE}${path.startsWith('/') ? path : `/${path}`}`;
+    let url;
+
+    if (/^https?:\/\//i.test(path)) {
+        url = path;
+    } else {
+        const endpoint = path.startsWith("/") ? path : "/" + path;
+        url = API_BASE + endpoint;
+    }
 
     const res = await fetch(url, {
         ...options,
         headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             ...(options.headers || {})
         }
     });
 
+    if (!res.ok) {
+        throw new Error("API error: " + res.status + " " + res.statusText);
+    }
+
+    return res.json();
+}
+```
     if (!res.ok) {
         throw new Error(`API error: ${res.status} ${res.statusText}`);
     }
