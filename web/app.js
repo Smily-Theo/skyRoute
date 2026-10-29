@@ -41,7 +41,7 @@ const API_BASE = 'https://skyroute-intelligence.onrender.com';
 async function api(path, options = {}) {
   const url = /^https?:\/\//i.test(path)
     ? path
-    : `${API_BASE}${path.startsWith('/') ? path : `/${path}`}`;
+    : `${API\_BASE}${path.startsWith('/') ? path : `/${path}`}`;
 
   const res = await fetch(url, {
     ...options,
@@ -123,7 +123,7 @@ function renderMap(id, { route = null, infra = false, labels = true } = {}) {
     'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {
       maxZoom: 19,
-      attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>'
+      attribution: '© <a href="https://www.openstreetmap.org/copyright" target="\_blank" rel="noopener">OpenStreetMap contributors</a>'
     }
   ).addTo(map);
 
@@ -330,7 +330,7 @@ function renderMap(id, { route = null, infra = false, labels = true } = {}) {
       const modeName = air ? 'SIMULATED FLIGHT' : 'ROAD TRAVEL';
 
       line.bindTooltip(
-        `${modeName} · ${fmt(seg.distance_km)} km · ${duration(seg.duration_minutes)}`,
+        `${modeName} · ${fmt(seg.distance\_km)} km · ${duration(seg.duration\_minutes)}`,
         {
           sticky: true,
           permanent: true,
@@ -355,8 +355,8 @@ function renderMap(id, { route = null, infra = false, labels = true } = {}) {
       const popup = (title, detail) =>
         `<div class="route-popup"><b>${esc(title)}</b><br>` +
         `${esc(detail || 'Journey waypoint')}<br>` +
-        `<strong>${fmt(seg.distance_km)} km</strong> · ` +
-        `${duration(seg.duration_minutes)}</div>`;
+        `<strong>${fmt(seg.distance\_km)} km</strong> · ` +
+        `${duration(seg.duration\_minutes)}</div>`;
 
       L.circleMarker(a, {
         pane: 'routeMarkers',
@@ -441,8 +441,8 @@ function renderMap(id, { route = null, infra = false, labels = true } = {}) {
       const d = L.DomUtil.create('div', 'route-map-legend');
 
       d.innerHTML =
-        '<span><i class="road-swatch"></i> Road travel</span>' +
-        '<span><i class="air-swatch"></i> Simulated flying-car</span>';
+        '<span><i class="road-swatch"> Road travel</span>' +
+        '<span><i class="air-swatch"> Simulated flying-car</span>';
 
       return d;
     };
@@ -553,7 +553,7 @@ function renderMap(id, { route = null, infra = false, labels = true } = {}) {
       const d = L.DomUtil.create('div', 'network-map-title');
 
       d.innerHTML =
-        '<b>TAMIL NADU · HYBRID MOBILITY NETWORK</b>' +
+        'TAMIL NADU · HYBRID MOBILITY NETWORK' +
         '<span>Road connectivity + hypothetical flying-car links</span>';
 
       return d;
@@ -567,9 +567,9 @@ function renderMap(id, { route = null, infra = false, labels = true } = {}) {
       const d = L.DomUtil.create('div', 'network-map-legend');
 
       d.innerHTML =
-        '<div><i class="network-road-key"></i><span><b>Road corridor</b><small>Blue solid · indicative</small></span></div>' +
-        '<div><i class="network-air-key"></i><span><b>Simulated air</b><small>Green dashed · hypothetical</small></span></div>' +
-        '<div><i class="network-hub-key">✦</i><span><b>Concept hub</b><small>Not an operating facility</small></span></div>';
+        '<div><i class="network-road-key"><span>Road corridor<small>Blue solid · indicative</small></span></div>' +
+        '<div><i class="network-air-key"><span>Simulated air<small>Green dashed · hypothetical</small></span></div>' +
+        '<div><i class="network-hub-key">✦<span>Concept hub<small>Not an operating facility</small></span></div>';
 
       return d;
     };
@@ -650,7 +650,7 @@ function routeCard(route) {
 
   const detail = route.segments
     .map(s =>
-      `${esc(s.mode === 'air' ? 'Air concept' : 'Road')}: ${duration(s.duration_minutes)}`
+      `${esc(s.mode === 'air' ? 'Air concept' : 'Road')}: ${duration(s.duration\_minutes)}`
     )
     .join(' · ');
 
@@ -664,15 +664,15 @@ function routeCard(route) {
           <p>${route.transfers} transfer${route.transfers === 1 ? '' : 's'} · ${fmt(route.distance_km)} km approx.</p>
         </div>
         <div class="route-metrics">
-          <b>${duration(route.duration_minutes)}</b>
+          ${duration(route.duration_minutes)}
           <small>${money(route.estimated_cost)} est.</small>
         </div>
         <span class="route-radio"></span>
       </div>
       <div class="route-details">
-        <span>Journey <b>${duration(route.duration_minutes)}</b></span>
-        <span>Distance <b>${fmt(route.distance_km)} km</b></span>
-        <span>Cost <b>${money(route.estimated_cost)}</b></span>
+        <span>Journey ${duration(route.duration_minutes)}</span>
+        <span>Distance ${fmt(route.distance_km)} km</span>
+        <span>Cost ${money(route.estimated_cost)}</span>
         <span>${detail}</span>
       </div>
     </article>`;
@@ -701,11 +701,11 @@ function renderJourneySteps(route) {
       ? 'Take off here and fly to the marked landing point (simulated).'
       : (
           i === 0 && route.segments.some(x => x.mode === 'air')
-            ? `Drive approximately ${fmt(seg.distance_km)} km by road to reach the takeoff point.`
+            ? `Drive approximately ${fmt(seg.distance\_km)} km by road to reach the takeoff point.`
             : (
                 route.segments.some(x => x.mode === 'air') &&
                 i === route.segments.length - 1
-                  ? `After landing, drive approximately ${fmt(seg.distance_km)} km by road to reach your destination.`
+                  ? `After landing, drive approximately ${fmt(seg.distance\_km)} km by road to reach your destination.`
                   : defaultText
               )
         );
@@ -714,12 +714,12 @@ function renderJourneySteps(route) {
       <article class="journey-step" data-step="${i}">
         <div class="journey-step-number ${mode}">${seg.mode === 'air' ? '✦' : i + 1}</div>
         <div class="journey-step-copy">
-          <b>${esc(title)}</b>
+          ${esc(title)}
           <span>${esc(seg.from)} <span class="step-arrow">→</span> ${esc(seg.to)}</span>
           <small>${esc(stageText || seg.instruction || defaultText)}</small>
         </div>
         <div class="journey-step-meta">
-          <b>${duration(seg.duration_minutes)}</b>
+          ${duration(seg.duration_minutes)}
           <small>${fmt(seg.distance_km)} km</small>
         </div>
       </article>`;
@@ -733,7 +733,7 @@ function renderRoutes(data) {
   state.selectedRoute = data.selected_route_id || state.routes[0]?.id;
 
   $('#routeSubtitle').textContent =
-    `${data.origin.name} → ${data.destination.name} · ${data.preference.replace('_', ' ')}`;
+    `${data.origin.name} → ${data.destination.name} · ${data.preference.replace('\_', ' ')}`;
 
   $('#resultsCount').textContent =
     `${state.routes.length} OPTION${state.routes.length === 1 ? '' : 'S'}`;
@@ -942,7 +942,6 @@ async function runRoutes() {
 }
 
 function startJourneyAnimation(route) {
-  // Stop any previous animation.
   if (state.animationFrame) {
     cancelAnimationFrame(state.animationFrame);
     state.animationFrame = null;
@@ -950,15 +949,12 @@ function startJourneyAnimation(route) {
 
   state.animationPaused = false;
   state.animationElapsed = 0;
+  state.animationDuration = 8000;
 
   const map = leafletMaps.routeMap;
 
-  if (!map || !route) {
-    toast('Please generate a route before starting the animation.');
-    return;
-  }
+  if (!map || !route) return;
 
-  // Collect valid coordinates from every journey segment.
   const segments = (route.segments || [])
     .map(seg => ({
       ...seg,
@@ -966,189 +962,25 @@ function startJourneyAnimation(route) {
         .filter(c =>
           Array.isArray(c) &&
           c.length >= 2 &&
-          Number.isFinite(Number(c[0])) &&
-          Number.isFinite(Number(c[1]))
+          Number.isFinite(+c[0]) &&
+          Number.isFinite(+c[1])
         )
-        .map(c => [Number(c[0]), Number(c[1])])
+        .map(c => [+c[0], +c[1]])
     }))
     .filter(seg => seg.coordinates.length >= 2);
 
-  const allPoints = [];
-
-  segments.forEach(seg => {
-    seg.coordinates.forEach(point => {
-      const previous = allPoints[allPoints.length - 1];
-
-      // Avoid duplicate consecutive coordinates.
-      if (
-        !previous ||
-        previous[0] !== point[0] ||
-        previous[1] !== point[1]
-      ) {
-        allPoints.push(point);
-      }
-    });
-  });
-
-  if (allPoints.length < 2) {
-    toast('This route has insufficient coordinates to animate.');
-    console.warn('Animation route data:', route);
+  if (!segments.length) {
+    toast('No route geometry is available to animate.');
     return;
   }
 
-  // Estimate the relative length of each route section.
-  const distances = [];
-  let totalDistance = 0;
+  const allPoints = segments.flatMap(seg => seg.coordinates);
+  const marker = L.marker(allPoints[0]).addTo(map);
 
-  for (let i = 1; i < allPoints.length; i++) {
-    const a = allPoints[i - 1];
-    const b = allPoints[i];
-
-    const avgLat = (a[0] + b[0]) / 2;
-    const dx = (b[1] - a[1]) * Math.cos(avgLat * Math.PI / 180);
-    const dy = b[0] - a[0];
-
-    const distance = Math.sqrt(dx * dx + dy * dy);
-
-    distances.push(distance);
-    totalDistance += distance;
-  }
-
-  if (totalDistance <= 0) {
-    toast('The route coordinates do not form a moving path.');
-    return;
-  }
-
-  // Build a cumulative distance table for smooth interpolation.
-  const cumulative = [0];
-
-  distances.forEach(distance => {
-    cumulative.push(cumulative[cumulative.length - 1] + distance);
-  });
-
-  // Use a car-style marker to make movement easy to see.
-  const vehicleIcon = L.divIcon({
-    className: 'skyroute-moving-vehicle',
-    html: `
-      <div style="
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        background: #ffffff;
-        border: 3px solid #2563eb;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.25);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 21px;
-      ">🚗</div>
-    `,
-    iconSize: [36, 36],
-    iconAnchor: [18, 18]
-  });
-
-  // Remove any previous animation marker.
-  if (state.animationMarker) {
-    map.removeLayer(state.animationMarker);
-  }
-
-  const marker = L.marker(allPoints[0], {
-    icon: vehicleIcon,
-    zIndexOffset: 2000,
-    interactive: false
-  }).addTo(map);
-
-  state.animationMarker = marker;
-
-  const durationMs = 10000;
   const startedAt = performance.now();
 
-  state.animationDuration = durationMs;
-  state.animationElapsed = 0;
-
-  $('#journeyProgressLabel').textContent = 'Journey in progress…';
-  $('#journeyProgressPercent').textContent = '0%';
-  $('#journeyProgressBar').style.width = '0%';
-
-  $('#replayJourney').disabled = false;
-  $('#replayJourney').textContent = '↻ Replay';
-
   $('#pauseJourney').disabled = false;
-  $('#pauseJourney').textContent = 'Ⅱ Pause';
-
-  function animate(now) {
-    if (state.animationPaused) {
-      state.animationFrame = null;
-      return;
-    }
-
-    const elapsed = now - startedAt;
-    const progress = Math.min(elapsed / durationMs, 1);
-
-    state.animationElapsed = elapsed;
-
-    // Convert animation progress into distance along the whole route.
-    const targetDistance = progress * totalDistance;
-
-    let segmentIndex = distances.length - 1;
-
-    for (let i = 0; i < distances.length; i++) {
-      if (targetDistance <= cumulative[i + 1]) {
-        segmentIndex = i;
-        break;
-      }
-    }
-
-    const segmentStart = cumulative[segmentIndex];
-    const segmentLength = distances[segmentIndex];
-
-    const segmentProgress = segmentLength > 0
-      ? Math.max(
-          0,
-          Math.min(1, (targetDistance - segmentStart) / segmentLength)
-        )
-      : 0;
-
-    const a = allPoints[segmentIndex];
-    const b = allPoints[segmentIndex + 1];
-
-    // Interpolate between coordinates for smooth movement.
-    const lat = a[0] + (b[0] - a[0]) * segmentProgress;
-    const lon = a[1] + (b[1] - a[1]) * segmentProgress;
-
-    marker.setLatLng([lat, lon]);
-
-    $('#journeyProgressPercent').textContent =
-      `${Math.round(progress * 100)}%`;
-
-    $('#journeyProgressBar').style.width =
-      `${progress * 100}%`;
-
-    $('#journeyProgressLabel').textContent =
-      progress >= 1
-        ? 'Journey completed! 🏁'
-        : 'Vehicle travelling along the route…';
-
-    if (progress < 1) {
-      state.animationFrame = requestAnimationFrame(animate);
-    } else {
-      marker.setLatLng(allPoints[allPoints.length - 1]);
-
-      state.animationFrame = null;
-      state.animationPaused = false;
-
-      $('#pauseJourney').disabled = true;
-      $('#pauseJourney').textContent = 'Ⅱ Pause';
-
-      $('#replayJourney').disabled = false;
-      $('#replayJourney').textContent = '↻ Replay';
-
-      toast('Journey animation completed! 🏁');
-    }
-  }
-
-  state.animationFrame = requestAnimationFrame(animate);
-}
+  $('#replayJourney').textContent = '↻ Replay';
 
   function frame(now) {
     if (state.animationPaused) return;
@@ -1162,10 +994,10 @@ function startJourneyAnimation(route) {
     marker.setLatLng(allPoints[pointIndex]);
 
     $('#journeyProgressPercent').textContent =
-      `${Math.round(progress * 100)}%`;
+      `${Math.round(progress \* 100)}%`;
 
     $('#journeyProgressBar').style.width =
-      `${progress * 100}%`;
+      `${progress \* 100}%`;
 
     $('#journeyProgressLabel').textContent =
       progress >= 1 ? 'Journey animation complete' : 'Simulating journey…';
@@ -1259,7 +1091,7 @@ function renderCandidates() {
         <div class="location-cell">
           <span class="rank-chip">${String(i + 1).padStart(2, '0')}</span>
           <div>
-            <b>${esc(c.city)}</b>
+            ${esc(c.city)}
             <small>${esc(c.district)} · ${c.nearest_hub_km} km to nearest concept hub</small>
           </div>
         </div>
@@ -1312,13 +1144,13 @@ function renderSimulation(d) {
   const m = d.metrics;
 
   $('#simSaved').innerHTML =
-    `${m.time_saved_minutes}<small>min</small>`;
+    `${m.time\_saved\_minutes}<small>min</small>`;
 
   $('#simUtil').innerHTML =
-    `${m.capacity_utilization_pct}<small>%</small>`;
+    `${m.capacity\_utilization\_pct}<small>%</small>`;
 
   $('#simCoverage').innerHTML =
-    `${m.network_coverage_pct}<small>%</small>`;
+    `${m.network\_coverage\_pct}<small>%</small>`;
 
   const max = Math.max(...d.chart.map(x => x.minutes));
 
@@ -1334,9 +1166,9 @@ function renderSimulation(d) {
     </div>
   `).join('') +
   '<div class="chart-legend">' +
-    '<span><i></i> Road baseline</span>' +
-    '<span><i class="teal"></i> Multimodal concept</span>' +
-    '<span><i class="orange"></i> Peak congestion</span>' +
+    '<span> Road baseline</span>' +
+    '<span><i class="teal"> Multimodal concept</span>' +
+    '<span><i class="orange"> Peak congestion</span>' +
   '</div>';
 
   const level = m.capacity_utilization_pct > 85
@@ -1349,10 +1181,10 @@ function renderSimulation(d) {
 
   $('#simSummary').innerHTML =
     `Under these assumptions, the illustrative network shows ` +
-    `<strong>${duration(m.road_only_minutes)}</strong> for a road-only baseline and ` +
-    `<strong>${duration(m.multimodal_minutes)}</strong> for a multimodal concept journey. ` +
+    `<strong>${duration(m.road\_only\_minutes)}</strong> for a road-only baseline and ` +
+    `<strong>${duration(m.multimodal\_minutes)}</strong> for a multimodal concept journey. ` +
     `The model indicates a potential difference of <strong>${saved} minutes</strong>. ` +
-    `Capacity utilization is <strong>${level} (${m.capacity_utilization_pct}%)</strong>; ` +
+    `Capacity utilization is <strong>${level} (${m.capacity\_utilization\_pct}%)</strong>; ` +
     `${level === 'high'
       ? 'capacity or service frequency may need further scenario testing.'
       : level === 'moderate'
