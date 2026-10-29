@@ -942,6 +942,7 @@ async function runRoutes() {
 }
 
 function startJourneyAnimation(route) {
+  // Stop any previous animation.
   if (state.animationFrame) {
     cancelAnimationFrame(state.animationFrame);
     state.animationFrame = null;
@@ -949,12 +950,15 @@ function startJourneyAnimation(route) {
 
   state.animationPaused = false;
   state.animationElapsed = 0;
-  state.animationDuration = 8000;
 
   const map = leafletMaps.routeMap;
 
-  if (!map || !route) return;
+  if (!map || !route) {
+    toast('Please generate a route before starting the animation.');
+    return;
+  }
 
+  // Collect valid coordinates from every journey segment.
   const segments = (route.segments || [])
     .map(seg => ({
       ...seg,
@@ -962,25 +966,189 @@ function startJourneyAnimation(route) {
         .filter(c =>
           Array.isArray(c) &&
           c.length >= 2 &&
-          Number.isFinite(+c[0]) &&
-          Number.isFinite(+c[1])
+          Number.isFinite(Number(c[0])) &&
+          Number.isFinite(Number(c[1]))
         )
-        .map(c => [+c[0], +c[1]])
+        .map(c => [Number(c[0]), Number(c[1])])
     }))
     .filter(seg => seg.coordinates.length >= 2);
 
-  if (!segments.length) {
-    toast('No route geometry is available to animate.');
+  const allPoints = [];
+
+  segments.forEach(seg => {
+    seg.coordinates.forEach(point => {
+      const previous = allPoints[allPoints.length - 1];
+
+      // Avoid duplicate consecutive coordinates.
+      if (
+        !previous ||
+        previous[0] !== point[0] ||
+        previous[1] !== point[1]
+      ) {
+        allPoints.push(point);
+      }
+    });
+  });
+
+  if (allPoints.length < 2) {
+    toast('This route has insufficient coordinates to animate.');
+    console.warn('Animation route data:', route);
     return;
   }
 
-  const allPoints = segments.flatMap(seg => seg.coordinates);
-  const marker = L.marker(allPoints[0]).addTo(map);
+  // Estimate the relative length of each route section.
+  const distances = [];
+  let totalDistance = 0;
 
+  for (let i = 1; i < allPoints.length; i++) {
+    const a = allPoints[i - 1];
+    const b = allPoints[i];
+
+    const avgLat = (a[0] + b[0]) / 2;
+    const dx = (b[1] - a[1]) * Math.cos(avgLat * Math.PI / 180);
+    const dy = b[0] - a[0];
+
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    distances.push(distance);
+    totalDistance += distance;
+  }
+
+  if (totalDistance <= 0) {
+    toast('The route coordinates do not form a moving path.');
+    return;
+  }
+
+  // Build a cumulative distance table for smooth interpolation.
+  const cumulative = [0];
+
+  distances.forEach(distance => {
+    cumulative.push(cumulative[cumulative.length - 1] + distance);
+  });
+
+  // Use a car-style marker to make movement easy to see.
+  const vehicleIcon = L.divIcon({
+    className: 'skyroute-moving-vehicle',
+    html: `
+      <div style="
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #ffffff;
+        border: 3px solid #2563eb;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 21px;
+      ">🚗</div>
+    `,
+    iconSize: [36, 36],
+    iconAnchor: [18, 18]
+  });
+
+  // Remove any previous animation marker.
+  if (state.animationMarker) {
+    map.removeLayer(state.animationMarker);
+  }
+
+  const marker = L.marker(allPoints[0], {
+    icon: vehicleIcon,
+    zIndexOffset: 2000,
+    interactive: false
+  }).addTo(map);
+
+  state.animationMarker = marker;
+
+  const durationMs = 10000;
   const startedAt = performance.now();
 
-  $('#pauseJourney').disabled = false;
+  state.animationDuration = durationMs;
+  state.animationElapsed = 0;
+
+  $('#journeyProgressLabel').textContent = 'Journey in progress…';
+  $('#journeyProgressPercent').textContent = '0%';
+  $('#journeyProgressBar').style.width = '0%';
+
+  $('#replayJourney').disabled = false;
   $('#replayJourney').textContent = '↻ Replay';
+
+  $('#pauseJourney').disabled = false;
+  $('#pauseJourney').textContent = 'Ⅱ Pause';
+
+  function animate(now) {
+    if (state.animationPaused) {
+      state.animationFrame = null;
+      return;
+    }
+
+    const elapsed = now - startedAt;
+    const progress = Math.min(elapsed / durationMs, 1);
+
+    state.animationElapsed = elapsed;
+
+    // Convert animation progress into distance along the whole route.
+    const targetDistance = progress * totalDistance;
+
+    let segmentIndex = distances.length - 1;
+
+    for (let i = 0; i < distances.length; i++) {
+      if (targetDistance <= cumulative[i + 1]) {
+        segmentIndex = i;
+        break;
+      }
+    }
+
+    const segmentStart = cumulative[segmentIndex];
+    const segmentLength = distances[segmentIndex];
+
+    const segmentProgress = segmentLength > 0
+      ? Math.max(
+          0,
+          Math.min(1, (targetDistance - segmentStart) / segmentLength)
+        )
+      : 0;
+
+    const a = allPoints[segmentIndex];
+    const b = allPoints[segmentIndex + 1];
+
+    // Interpolate between coordinates for smooth movement.
+    const lat = a[0] + (b[0] - a[0]) * segmentProgress;
+    const lon = a[1] + (b[1] - a[1]) * segmentProgress;
+
+    marker.setLatLng([lat, lon]);
+
+    $('#journeyProgressPercent').textContent =
+      `${Math.round(progress * 100)}%`;
+
+    $('#journeyProgressBar').style.width =
+      `${progress * 100}%`;
+
+    $('#journeyProgressLabel').textContent =
+      progress >= 1
+        ? 'Journey completed! 🏁'
+        : 'Vehicle travelling along the route…';
+
+    if (progress < 1) {
+      state.animationFrame = requestAnimationFrame(animate);
+    } else {
+      marker.setLatLng(allPoints[allPoints.length - 1]);
+
+      state.animationFrame = null;
+      state.animationPaused = false;
+
+      $('#pauseJourney').disabled = true;
+      $('#pauseJourney').textContent = 'Ⅱ Pause';
+
+      $('#replayJourney').disabled = false;
+      $('#replayJourney').textContent = '↻ Replay';
+
+      toast('Journey animation completed! 🏁');
+    }
+  }
+
+  state.animationFrame = requestAnimationFrame(animate);
+}
 
   function frame(now) {
     if (state.animationPaused) return;
