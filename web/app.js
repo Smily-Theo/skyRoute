@@ -39,7 +39,6 @@ function toast(message) {
 const API_BASE = 'https://skyroute-intelligence.onrender.com';
 
 ```javascript
-```javascript
 async function api(path, options = {}) {
     let url;
 
